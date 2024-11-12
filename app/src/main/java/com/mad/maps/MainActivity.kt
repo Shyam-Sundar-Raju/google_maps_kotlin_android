@@ -25,7 +25,6 @@ import com.mad.maps.data.MarkerData
 import com.mad.maps.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
-
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMainBinding
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -103,9 +102,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         builder.setTitle("Delete Marker")
         builder.setMessage("Do you want to delete this marker?")
         builder.setPositiveButton("Yes") { dialog, _ ->
+            marker.remove()
             val markerData = MarkerData(marker.title ?: "", marker.position)
             markerDataCacheHandler?.deleteMarkerData(markerData)
-            marker.remove()
             Toast.makeText(this, "Marker deleted", Toast.LENGTH_SHORT).show()
             dialog.dismiss()
         }
