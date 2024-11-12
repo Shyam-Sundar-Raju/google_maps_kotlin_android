@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">maps</string>
+    <string name="latitude">Latitude</string>
+    <string name="longitude">Longitude</string>
+    <string name="title">Title</string>
+    <string name="add_marker">Add Marker</string>
+    <string name="add_marker_button_text">Add Marker</string>
+    <string name="close">Close</string>
+</resources>
