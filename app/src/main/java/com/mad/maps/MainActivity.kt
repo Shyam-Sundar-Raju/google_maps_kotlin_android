@@ -1,6 +1,7 @@
 package com.mad.maps
 
 import android.Manifest
+import android.app.AlertDialog
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
@@ -18,9 +19,9 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
-import android.app.AlertDialog
 import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
+import com.mad.maps.data.MarkerData
 import com.mad.maps.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -76,9 +77,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             val title = titleInput.text.toString()
 
             if (latitude != null && longitude != null && title.isNotEmpty()) {
-                val latLng = LatLng(latitude, longitude)
-                addMarker(latLng, title)
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng))
+                val markerData = MarkerData(title, LatLng(latitude, longitude))
+                addMarker(markerData)
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(markerData.latLng))
+                mMap.animateCamera(CameraUpdateFactory.zoomTo(8.0f))
+                isCardVisible = false
+                updateAddMarkerCardVisibility()
             } else {
                 Toast.makeText(this, "Please enter valid coordinates and title", Toast.LENGTH_SHORT).show()
             }
@@ -113,14 +117,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         // Uncomment the following line to enable satellite view.
         // mMap.mapType = GoogleMap.MAP_TYPE_SATELLITE
 
-        // Adding a dummy marker in Sydney.
         mMap.setOnMarkerClickListener { marker ->
             showDeleteConfirmationDialog(marker)
             true // Return true to indicate we have handled the event
         }
-
-        val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
 
         if (ActivityCompat.checkSelfPermission(
                 this,
@@ -138,7 +138,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             if (location != null) {
                 val currentLatLng = LatLng(location.latitude, location.longitude)
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng))
-                mMap.animateCamera(CameraUpdateFactory.zoomTo(16.0f))
+                mMap.animateCamera(CameraUpdateFactory.zoomTo(8.0f))
             }
         }
     }
@@ -165,7 +165,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                         if (location != null) {
                             val currentLatLng = LatLng(location.latitude, location.longitude)
                             mMap.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng))
-                            mMap.animateCamera(CameraUpdateFactory.zoomTo(16.0f))
+                            mMap.animateCamera(CameraUpdateFactory.zoomTo(8.0f))
                         }
                     }
                 }
@@ -176,8 +176,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun addMarker(latLng: LatLng, title: String) {
-        mMap.addMarker(MarkerOptions().position(latLng).title(title))
+    private fun addMarker(markerData: MarkerData) {
+        mMap.addMarker(MarkerOptions().position(markerData.latLng).title(markerData.title))
     }
 
     private fun updateAddMarkerCardVisibility() {
@@ -193,6 +193,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             binding.longitudeInput.text.clear()
             binding.titleInput.text.clear()
             binding.cardAddMarker.visibility = View.GONE
+            val imm = getSystemService(INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+            imm.hideSoftInputFromWindow(binding.fabAddMarker.windowToken, 0)
         }
     }
 
