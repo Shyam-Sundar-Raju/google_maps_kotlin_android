@@ -30,6 +30,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityMainBinding
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var isCardVisible = false
+    private var markerDataCacheHandler: MarkerDataCacheHandler? = null
 
     private fun requestLocationPermissions() {
         if (ContextCompat.checkSelfPermission(
@@ -60,6 +61,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        markerDataCacheHandler = MarkerDataCacheHandler(this)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         val mapFragment = supportFragmentManager
@@ -101,6 +103,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         builder.setTitle("Delete Marker")
         builder.setMessage("Do you want to delete this marker?")
         builder.setPositiveButton("Yes") { dialog, _ ->
+            val markerData = MarkerData(marker.title ?: "", marker.position)
+            markerDataCacheHandler?.deleteMarkerData(markerData)
             marker.remove()
             Toast.makeText(this, "Marker deleted", Toast.LENGTH_SHORT).show()
             dialog.dismiss()
@@ -113,6 +117,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+
+        val markerDataList = markerDataCacheHandler?.getMarkerDataList()
+        markerDataList?.forEach { markerData ->
+            addMarker(markerData)
+        }
 
         // Uncomment the following line to enable satellite view.
         // mMap.mapType = GoogleMap.MAP_TYPE_SATELLITE
@@ -178,6 +187,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun addMarker(markerData: MarkerData) {
         mMap.addMarker(MarkerOptions().position(markerData.latLng).title(markerData.title))
+        markerDataCacheHandler?.saveMarkerData(markerData)
     }
 
     private fun updateAddMarkerCardVisibility() {
