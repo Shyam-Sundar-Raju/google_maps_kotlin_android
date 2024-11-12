@@ -19,6 +19,8 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import android.app.AlertDialog
+import com.google.android.gms.maps.model.Marker
 import com.mad.maps.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -90,6 +92,21 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     }
 
+    private fun showDeleteConfirmationDialog(marker: Marker) {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Delete Marker")
+        builder.setMessage("Do you want to delete this marker?")
+        builder.setPositiveButton("Yes") { dialog, _ ->
+            marker.remove()
+            Toast.makeText(this, "Marker deleted", Toast.LENGTH_SHORT).show()
+            dialog.dismiss()
+        }
+        builder.setNegativeButton("No") { dialog, _ ->
+            dialog.dismiss()
+        }
+        builder.show()
+    }
+
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
@@ -97,6 +114,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         // mMap.mapType = GoogleMap.MAP_TYPE_SATELLITE
 
         // Adding a dummy marker in Sydney.
+        mMap.setOnMarkerClickListener { marker ->
+            showDeleteConfirmationDialog(marker)
+            true // Return true to indicate we have handled the event
+        }
+
         val sydney = LatLng(-34.0, 151.0)
         mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
 
