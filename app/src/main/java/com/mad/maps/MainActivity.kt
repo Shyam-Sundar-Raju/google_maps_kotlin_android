@@ -98,9 +98,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             updateAddMarkerCardVisibility()
         }
 
-        // Used to choose between 3 map types: Normal, Terrain, Satellite, Hybrid
+        // Used to choose between 3 map types: Normal, Terrain, Satellite
         val mapTypeSpinner: Spinner = findViewById(R.id.mapTypeSpinner)
-        val mapTypes = arrayOf("Normal  ", "Terrain  ", "Hybrid")
+        val mapTypes = arrayOf("Normal  ", "Terrain  ", "Satellite")
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, mapTypes)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         mapTypeSpinner.adapter = adapter
